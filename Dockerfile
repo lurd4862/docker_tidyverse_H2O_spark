@@ -72,6 +72,13 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
   libpq-dev \
   libssh2-1-dev 
 
+RUN apt-get install -y gnupg2
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'
+RUN apt update
+RUN apt install -y r-base
+
 RUN apt-get install -y wget
 
 ## for the functionality to work I will need to build things with the latest version of Rstudio v1.2
@@ -87,7 +94,9 @@ RUN dpkg -i rstudio-server-1.2.1335-amd64.deb
 RUN rm rstudio-server-1.2.1335-amd64.deb
 
 ## create an user to run Rstudio with
-RUN useradd -ms /bin/bash  rstudio
+RUN useradd -rm -d /home/rstudio -s /bin/bash -g root -G sudo -u 1000 -p rstudio rstudio
+USER rstudio
+WORKDIR /home/rstudio
 
 ## expose the Rstudio port 8787
 EXPOSE 8787 8787
